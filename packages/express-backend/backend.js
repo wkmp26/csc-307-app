@@ -39,7 +39,7 @@ const removeUser = (id) => {
 }
     
   
-  app.get("/users", (req, res) => {
+app.get("/users", (req, res) => {
     const name = req.query.name;
     const job = req.query.job;
     if ((name != undefined) && (job != undefined)){
@@ -71,14 +71,22 @@ const removeUser = (id) => {
 
   app.post("/users", (req, res) => {
     const userToAdd = req.body;
+    userToAdd["id"] = Math.random();
     addUser(userToAdd);
-    res.send();
+    res.status(201).send(JSON.stringify(userToAdd));
   });
 
   app.delete("/users/:id", (req, res) => {
+    console.log("Delete Request");
     const id = req.params["id"]; //or req.params.id
-    removeUser(id);
-    res.send();
+    if( id == undefined){
+        res.status(404).send("Resource not found.");
+    }else{
+        console.log("id found");
+        removeUser(id);
+        console.log("return");
+        res.status(204).send();
+    }
   });
 
 app.listen(port, () => {
