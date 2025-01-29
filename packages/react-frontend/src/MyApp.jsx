@@ -36,8 +36,9 @@ function MyApp() {
         postUser(person)
           .then((res) => {
             if (res.status != 201) throw new Error("Content Not Created"); 
-            res.json();})
-            .then((user) => setCharacters([...characters, user]))
+            //needed to add return for mutiline 
+            return res.json();})
+            .then((user) => {setCharacters([...characters, user]); console.log(`${user}`);})
           .catch((error) => {
             console.log(error);
           });

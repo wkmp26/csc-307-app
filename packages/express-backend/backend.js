@@ -73,6 +73,8 @@ app.get("/users", (req, res) => {
     const userToAdd = req.body;
     userToAdd["id"] = Math.random();
     addUser(userToAdd);
+
+    //error occuring here
     res.status(201).send(JSON.stringify(userToAdd));
   });
 
