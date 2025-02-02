@@ -1,6 +1,30 @@
 // backend.js
 import express from "express";
 import cors from "cors";
+import service from "./services/user-service.js"
+
+/*
+{
+  addUser,
+  getUsers,
+  findUserById,
+  findUserByName,
+  findUserByJob,
+} from
+
+*/
+
+import dotenv from "dotenv";
+import mongoose from "mongoose";
+
+dotenv.config();
+
+const { MONGO_CONNECTION_STRING } = process.env;
+
+mongoose.set("debug", true);
+mongoose
+  .connect(MONGO_CONNECTION_STRING + "users") // connect to Db "users"
+  .catch((error) => console.log(error));
 
 const app = express();
 const port = 8000;
@@ -8,7 +32,9 @@ const port = 8000;
 app.use(cors());
 app.use(express.json());
 
+/*
 const findUserByName = (name) => {
+    users = getUsers.then((res)=>res.toObject()).catch(console.log("An Error has Occured"))
     return users["users_list"].filter(
       (user) => user["name"] === name
     );
@@ -37,31 +63,47 @@ const addUser = (user) => {
 const removeUser = (id) => {
     users["users_list"] = users["users_list"].filter((user) => user["id"] != id);
 }
+    */
     
   
 app.get("/users", (req, res) => {
     const name = req.query.name;
     const job = req.query.job;
     if ((name != undefined) && (job != undefined)){
-      let result = findUserByNameJob(name,job);
+      //let result = findUserByNameJob(name,job);
+      let result = findUserByName(name).then((res)=>res.map(user => user.toObject())).catch("An Error has Occured")
       result = { users_list: result };
       res.send(result);
     } else if (name != undefined){
-        let result = findUserByName(name);
+        //let result = findUserByName(name);
+        let result = findUserByName(name).then((res)=>res.map(user => user.toObject())).catch("An Error has Occured")
         result = { users_list: result };
         res.send(result);
     }else if (job != undefined) {
-        let result = findUserByJob(job);
+        //let result = findUserByJob(job);
+        let result = findUserByJob(job).then((res)=>res.map(user => user.toObject())).catch("An Error has Occured")
         result = { users_list: result };
         res.send(result);
+        
     } else {
-      res.send(users);
+
+      service.getUsers(undefined,undefined)
+        .then(
+          (users)=>{
+            const users_list = users.map(user => user.toObject());
+            res.send(users_list);
+      }).catch(console.log((error) => console.error(error)))
+      console.log("Complete!");
+      
+      // res.send(users);
     }
   });
   
   app.get("/users/:id", (req, res) => {
     const id = req.params["id"]; //or req.params.id
-    let result = findUserById(id);
+    //let result = findUserById(id);
+    let result = findUserById(id).then((res)=>res.toObject()).catch("An Error has Occured")
+
     if (result === undefined) {
       res.status(404).send("Resource not found.");
     } else {
@@ -72,9 +114,8 @@ app.get("/users", (req, res) => {
   app.post("/users", (req, res) => {
     const userToAdd = req.body;
     userToAdd["id"] = Math.random();
-    addUser(userToAdd);
-
-    //error occuring here
+    //addUser(userToAdd);
+    addUser(userToAdd).then(()=>res.status(201).send(JSON.stringify(userToAdd)));
     res.status(201).send(JSON.stringify(userToAdd));
   });
 
@@ -97,6 +138,7 @@ app.listen(port, () => {
   );
 });
 
+/*
 const users = {
     users_list: [
       {
@@ -126,3 +168,4 @@ const users = {
       }
     ]
   };
+  */
