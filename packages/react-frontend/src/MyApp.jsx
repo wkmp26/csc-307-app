@@ -14,7 +14,7 @@ function MyApp() {
 
       console.log(`${updated}`)
 
-        const id = characters[index]["id"];
+        const id = characters[index]["_id"];
 
         console.log(`Delete Request ${id}`);
         deleteUser(id)

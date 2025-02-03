@@ -3,6 +3,7 @@ import express from "express";
 import cors from "cors";
 import service from "./services/user-service.js"
 
+
 /*
 {
   addUser,
@@ -71,26 +72,41 @@ app.get("/users", (req, res) => {
     const job = req.query.job;
     if ((name != undefined) && (job != undefined)){
       //let result = findUserByNameJob(name,job);
-      let result = findUserByName(name).then((res)=>res.map(user => user.toObject())).catch("An Error has Occured")
-      result = { users_list: result };
-      res.send(result);
+      service.findUserByNameJob(name,job).then(
+          (users)=>{
+            let users_list = { users_list: users.map(user => user.toObject())};
+            res.send(users_list);
+      }).catch(console.log((error) => console.error(error)));
     } else if (name != undefined){
-        //let result = findUserByName(name);
+        /*let result = findUserByName(name);
         let result = findUserByName(name).then((res)=>res.map(user => user.toObject())).catch("An Error has Occured")
         result = { users_list: result };
         res.send(result);
+        */
+        service.getUsers(name,undefined)
+        .then(
+          (users)=>{
+            let users_list = { users_list: users.map(user => user.toObject())};
+            res.send(users_list);
+      }).catch(console.log((error) => console.error(error)))
     }else if (job != undefined) {
-        //let result = findUserByJob(job);
+        /*let result = findUserByJob(job);
         let result = findUserByJob(job).then((res)=>res.map(user => user.toObject())).catch("An Error has Occured")
         result = { users_list: result };
-        res.send(result);
+        res.send(result); */
+        service.getUsers(undefined,job)
+        .then(
+          (users)=>{
+            let users_list = { users_list: users.map(user => user.toObject())};
+            res.send(users_list);
+      }).catch(console.log((error) => console.error(error)))
         
     } else {
 
       service.getUsers(undefined,undefined)
         .then(
           (users)=>{
-            const users_list = users.map(user => user.toObject());
+            let users_list = { users_list: users.map(user => user.toObject())};
             res.send(users_list);
       }).catch(console.log((error) => console.error(error)))
       console.log("Complete!");
@@ -99,38 +115,44 @@ app.get("/users", (req, res) => {
     }
   });
   
+  //GET user by ID
   app.get("/users/:id", (req, res) => {
     const id = req.params["id"]; //or req.params.id
     //let result = findUserById(id);
-    let result = findUserById(id).then((res)=>res.toObject()).catch("An Error has Occured")
-
-    if (result === undefined) {
-      res.status(404).send("Resource not found.");
-    } else {
-      res.send(result);
-    }
+    let result = undefined;
+    service.findUserById(id)
+              .then((user)=>{
+                result = user.toObject(); 
+                if (result === undefined) {
+                  res.status(404).send("Resource not found.");
+                } else {
+                  res.send(result);
+                }
+              }).catch("An Error has Occured")
+    
+  
   });
 
+  //POST
   app.post("/users", (req, res) => {
     const userToAdd = req.body;
-    userToAdd["id"] = Math.random();
+    //userToAdd["id"] = Math.random();
     //addUser(userToAdd);
-    addUser(userToAdd).then(()=>res.status(201).send(JSON.stringify(userToAdd)));
-    res.status(201).send(JSON.stringify(userToAdd));
+    service.addUser(userToAdd).then(()=>res.status(201).send(JSON.stringify(userToAdd)));
+
+    //res.status(201).send(JSON.stringify(userToAdd));
   });
 
   app.delete("/users/:id", (req, res) => {
     console.log("Delete Request");
     const id = req.params["id"]; //or req.params.id
+
     if( id == undefined){
         res.status(404).send("Resource not found.");
     }else{
-        console.log("id found");
-        removeUser(id);
-        console.log("return");
-        res.status(204).send();
-    }
-  });
+      service.deleteUserById(id).then(()=>res.status(204).send()).catch(console.log((error) => console.error(error)));
+      }
+    });
 
 app.listen(port, () => {
   console.log(
