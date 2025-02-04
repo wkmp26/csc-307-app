@@ -14,10 +14,10 @@ function MyApp() {
 
       console.log(`${updated}`)
 
-        const id = characters[index]["_id"];
+        const _id = characters[index]["_id"];
 
-        console.log(`Delete Request ${id}`);
-        deleteUser(id)
+        console.log(`Delete Request ${_id}`);
+        deleteUser(_id)
         .then((res)=>{
           if (res.status != 204) throw new Error("Content Not Deleted");
           setCharacters(updated);})
@@ -27,8 +27,8 @@ function MyApp() {
 
     }
 
-    function deleteUser(id){
-        const promise = fetch(`http://localhost:8000/users/${id}`, {method: 'DELETE'});
+    function deleteUser(_id){
+        const promise = fetch(`http://localhost:8000/users/${_id}`, {method: 'DELETE'});
         return promise;
     }
 

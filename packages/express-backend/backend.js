@@ -116,11 +116,11 @@ app.get("/users", (req, res) => {
   });
   
   //GET user by ID
-  app.get("/users/:id", (req, res) => {
-    const id = req.params["id"]; //or req.params.id
+  app.get("/users/:_id", (req, res) => {
+    const _id = req.params["_id"]; //or req.params.id
     //let result = findUserById(id);
     let result = undefined;
-    service.findUserById(id)
+    service.findUserById(_id)
               .then((user)=>{
                 result = user.toObject(); 
                 if (result === undefined) {
@@ -138,19 +138,19 @@ app.get("/users", (req, res) => {
     const userToAdd = req.body;
     //userToAdd["id"] = Math.random();
     //addUser(userToAdd);
-    service.addUser(userToAdd).then(()=>res.status(201).send(JSON.stringify(userToAdd)));
+    service.addUser(userToAdd).then((user)=>res.status(201).send(JSON.stringify(user.toObject())));
 
     //res.status(201).send(JSON.stringify(userToAdd));
   });
 
-  app.delete("/users/:id", (req, res) => {
+  app.delete("/users/:_id", (req, res) => {
     console.log("Delete Request");
-    const id = req.params["id"]; //or req.params.id
+    const _id = req.params["_id"]; //or req.params.id
 
-    if( id == undefined){
+    if( _id == undefined){
         res.status(404).send("Resource not found.");
     }else{
-      service.deleteUserById(id).then(()=>res.status(204).send()).catch(console.log((error) => console.error(error)));
+      service.deleteUserById(_id).then(()=>res.status(204).send()).catch(console.log((error) => console.error(error)));
       }
     });
 
